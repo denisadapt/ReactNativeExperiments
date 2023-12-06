@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState} from "react";
 import type {PropsWithChildren} from 'react';
 import {
   Button,
@@ -63,6 +63,9 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [greeting, setGreeting] = useState('');
+  const [addition, setAddition] = useState(0);
+  const [fileContents, setFileContents] = useState('');
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -71,7 +74,7 @@ function App(): JSX.Element {
   const showGreeting = async () => {
     try {
       const greeting = await MyLibraryWrapper.greet('World');
-      console.log(greeting);
+      setGreeting(greeting);
     } catch (e) {
       console.error(e);
     }
@@ -80,7 +83,7 @@ function App(): JSX.Element {
   const showAddition = async () => {
     try {
       const result = await MyLibraryWrapper.add(5, 3);
-      console.log(`Result: ${result}`);
+      setAddition(`Result: ${result}`);
     } catch (e) {
       console.error(e);
     }
@@ -92,7 +95,7 @@ function App(): JSX.Element {
       const result = await MyLibraryWrapper.readFileContents(
         RNFS.MainBundlePath + '/test.txt',
       );
-      console.log(`Result: ${result}`);
+      setFileContents(`Result: ${result}`);
     } catch (e) {
       console.error(e);
     }
@@ -112,25 +115,18 @@ function App(): JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
           <Section title="Greeting">
+            <Text>{greeting}</Text>
             <Button title="Greet" onPress={showGreeting} />
+          </Section>
+          <Section title="Addition">
+            <Text>{addition}</Text>
             <Button title="Add" onPress={showAddition} />
+          </Section>
+          <Section title="Read local file">
+            <Text>{fileContents}</Text>
             <Button title="Read file" onPress={readLocalFile} />
           </Section>
-          <LearnMoreLinks />
         </View>
       </ScrollView>
     </SafeAreaView>
