@@ -1,11 +1,14 @@
 package com.nativeaddondemo;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.Promise;
 
 public class MyLibraryWrapper extends ReactContextBaseJavaModule {
 
@@ -18,8 +21,9 @@ public class MyLibraryWrapper extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public String greet( String arg )
+    public void greet( String arg, Promise prom )
     {
-        return "Successfully started up! Got a string: ";
+        Log.d( "MyLibraryWrapper", "Got string: " + arg );
+        prom.resolve("Successfully started up! Got a string: " + arg);
     }
 }
