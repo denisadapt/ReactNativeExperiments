@@ -44,15 +44,15 @@
 }
 - (instancetype)init;
 - (instancetype)initWithContext:(AdaptPacketContext*)context;
-- (AdaptPacketContext*)LoadFromFile:(NSString*)filename;
-- (AdaptPacketContext*)LoadFromContents:(NSData*)bin;
++ (AdaptPacketContext*)LoadFromFile:(NSString*)filename;
++ (AdaptPacketContext*)LoadFromContents:(NSData*)bin;
 
 - (AdaptValue*)ParseValue:(AdaptValue*)source;
 - (AdaptValue*)ParseValueFromJSON:(NSString*)json;
 - (AdaptValue*)CreateDictionary;
 - (AdaptValue*)NewBinaryFromHex:(NSString*)hex;
 - (AdaptValue*)NewBinaryFromBuffer:(NSData*)data;
-- (AdaptValue*)ExecuteTransaction:(AdaptValue*)transaction :(NSString*)entropy_hex :(AdaptValue*)timestamp;
+- (AdaptValue*)ExecuteTransaction:(AdaptValue*)transaction entropy_hex:(NSString*)entropy_hex timestamp:(AdaptValue*)timestamp;
 //- (AdaptFunctionInvocation*)GetFunction:(NSString*)functionName;
 - (AdaptValue*)GetHash;
 - (NSData*)Serialize;
@@ -69,7 +69,7 @@
 
 + (BOOL)Initialize:(BOOL)test_mode;
 + (AdaptPacketContext*)EmptyPacket:(BOOL)secure;
-+ (AdaptPacketContext*)CreatePacket:(AdaptEvaluationUnit*)unit :(NSString*)seed :(NSString*)entropy :(BOOL)secure;
++ (AdaptPacketContext*)CreatePacket:(AdaptEvaluationUnit*)unit seed:(NSString*)seed entropy:(NSString*)entropy secure:(BOOL)secure;
 + (AdaptValue*)SystemTime;
 + (AdaptValue*)ParseTime:(NSString*)timestamp;
 + (AdaptValue*)GetRandomBytes:(NSInteger)length;
