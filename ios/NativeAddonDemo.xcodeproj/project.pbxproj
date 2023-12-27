@@ -12,8 +12,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		42C8732D2B1967130000F773 /* MyLibraryWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42C8732C2B1967130000F773 /* MyLibraryWrapper.mm */; };
-		42D871B22B1F898A002D15BA /* libmylibrary.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D871B12B1F898A002D15BA /* libmylibrary.a */; };
+		42B7896B2B3480A2005CF02C /* libMyLibrary.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B7896A2B3480A2005CF02C /* libMyLibrary.a */; };
+		42B789702B35EBC9005CF02C /* libgmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B7896F2B35EBC9005CF02C /* libgmp.a */; };
+		42B789722B35EC12005CF02C /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789712B35EC12005CF02C /* libsodium.a */; };
+		42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789732B35EC2A005CF02C /* libwolfssl.a */; };
+		42B789762B35EC40005CF02C /* libnitroattest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789752B35EC40005CF02C /* libnitroattest.a */; };
+		42B789862B3C8355005CF02C /* libadapt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789852B3C8355005CF02C /* libadapt.a */; };
+		42C8732D2B1967130000F773 /* AdaptWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42C8732C2B1967130000F773 /* AdaptWrapper.mm */; };
 		42D871B42B1F8B41002D15BA /* test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 42D871B32B1F8B41002D15BA /* test.txt */; };
 		7699B88040F8A987B510C191 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -41,10 +46,16 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NativeAddonDemo/main.m; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeAddonDemo-NativeAddonDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-NativeAddonDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeAddonDemo.debug.xcconfig"; path = "Target Support Files/Pods-NativeAddonDemo/Pods-NativeAddonDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		42C8732A2B1966B10000F773 /* mylibrary.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mylibrary.hh; sourceTree = "<group>"; };
-		42C8732B2B1966FC0000F773 /* MyLibraryWrapper.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MyLibraryWrapper.hh; sourceTree = "<group>"; };
-		42C8732C2B1967130000F773 /* MyLibraryWrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MyLibraryWrapper.mm; sourceTree = "<group>"; };
-		42D871B12B1F898A002D15BA /* libmylibrary.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmylibrary.a; sourceTree = "<group>"; };
+		42B789652B34650A005CF02C /* MyLibrary.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MyLibrary.hh; sourceTree = "<group>"; };
+		42B7896A2B3480A2005CF02C /* libMyLibrary.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libMyLibrary.a; sourceTree = "<group>"; };
+		42B7896E2B35EACF005CF02C /* mufl-bindings_ios.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "mufl-bindings_ios.hh"; sourceTree = "<group>"; };
+		42B7896F2B35EBC9005CF02C /* libgmp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgmp.a; sourceTree = "<group>"; };
+		42B789712B35EC12005CF02C /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsodium.a; sourceTree = "<group>"; };
+		42B789732B35EC2A005CF02C /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwolfssl.a; sourceTree = "<group>"; };
+		42B789752B35EC40005CF02C /* libnitroattest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libnitroattest.a; sourceTree = "<group>"; };
+		42B789852B3C8355005CF02C /* libadapt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadapt.a; sourceTree = "<group>"; };
+		42C8732B2B1966FC0000F773 /* AdaptWrapper.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AdaptWrapper.hh; sourceTree = "<group>"; };
+		42C8732C2B1967130000F773 /* AdaptWrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AdaptWrapper.mm; sourceTree = "<group>"; };
 		42D871B32B1F8B41002D15BA /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-NativeAddonDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeAddonDemo.release.xcconfig"; path = "Target Support Files/Pods-NativeAddonDemo/Pods-NativeAddonDemo.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-NativeAddonDemo-NativeAddonDemoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeAddonDemo-NativeAddonDemoTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeAddonDemo-NativeAddonDemoTests/Pods-NativeAddonDemo-NativeAddonDemoTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -67,8 +78,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42B789722B35EC12005CF02C /* libsodium.a in Frameworks */,
 				0C80B921A6F3F58F76C31292 /* libPods-NativeAddonDemo.a in Frameworks */,
-				42D871B22B1F898A002D15BA /* libmylibrary.a in Frameworks */,
+				42B789762B35EC40005CF02C /* libnitroattest.a in Frameworks */,
+				42B7896B2B3480A2005CF02C /* libMyLibrary.a in Frameworks */,
+				42B789862B3C8355005CF02C /* libadapt.a in Frameworks */,
+				42B789702B35EBC9005CF02C /* libgmp.a in Frameworks */,
+				42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,8 +111,13 @@
 		13B07FAE1A68108700A75B9A /* NativeAddonDemo */ = {
 			isa = PBXGroup;
 			children = (
+				42B789852B3C8355005CF02C /* libadapt.a */,
+				42B789752B35EC40005CF02C /* libnitroattest.a */,
+				42B789732B35EC2A005CF02C /* libwolfssl.a */,
+				42B789712B35EC12005CF02C /* libsodium.a */,
+				42B7896F2B35EBC9005CF02C /* libgmp.a */,
+				42B7896A2B3480A2005CF02C /* libMyLibrary.a */,
 				42D871B32B1F8B41002D15BA /* test.txt */,
-				42D871B12B1F898A002D15BA /* libmylibrary.a */,
 				42C873292B1966980000F773 /* include */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -121,9 +142,10 @@
 		42C873292B1966980000F773 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				42C8732A2B1966B10000F773 /* mylibrary.hh */,
-				42C8732B2B1966FC0000F773 /* MyLibraryWrapper.hh */,
-				42C8732C2B1967130000F773 /* MyLibraryWrapper.mm */,
+				42B7896E2B35EACF005CF02C /* mufl-bindings_ios.hh */,
+				42B789652B34650A005CF02C /* MyLibrary.hh */,
+				42C8732B2B1966FC0000F773 /* AdaptWrapper.hh */,
+				42C8732C2B1967130000F773 /* AdaptWrapper.mm */,
 			);
 			name = include;
 			sourceTree = "<group>";
@@ -435,7 +457,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42C8732D2B1967130000F773 /* MyLibraryWrapper.mm in Sources */,
+				42C8732D2B1967130000F773 /* AdaptWrapper.mm in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

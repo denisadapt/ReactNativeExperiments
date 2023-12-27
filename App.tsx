@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useState} from "react";
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Button,
@@ -19,17 +19,11 @@ import {
   NativeModules,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 import RNFS from 'react-native-fs';
 
-const {MyLibraryWrapper} = NativeModules;
+const {AdaptWrapper} = NativeModules;
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -73,8 +67,8 @@ function App(): JSX.Element {
 
   const showGreeting = async () => {
     try {
-      const greeting = await MyLibraryWrapper.greet('World');
-      setGreeting(greeting);
+      const greetingStr = await AdaptWrapper.greet('World');
+      setGreeting(greetingStr);
     } catch (e) {
       console.error(e);
     }
@@ -82,7 +76,7 @@ function App(): JSX.Element {
 
   const showAddition = async () => {
     try {
-      const result = await MyLibraryWrapper.add(5, 3);
+      const result = await AdaptWrapper.add(5, 3);
       setAddition(`Result: ${result}`);
     } catch (e) {
       console.error(e);
@@ -92,7 +86,7 @@ function App(): JSX.Element {
   const readLocalFile = async () => {
     try {
       console.log(RNFS.MainBundlePath);
-      const result = await MyLibraryWrapper.readFileContents(
+      const result = await AdaptWrapper.readFileContents(
         RNFS.MainBundlePath + '/test.txt',
       );
       setFileContents(`Result: ${result}`);
