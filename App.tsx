@@ -16,14 +16,16 @@ import {
   Text,
   useColorScheme,
   View,
-  NativeModules,
+  // NativeModules,
 } from 'react-native';
 
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
-import RNFS from 'react-native-fs';
+import {AdaptEnvironment} from './addon';
 
-const {AdaptWrapper} = NativeModules;
+// import RNFS from 'react-native-fs';
+
+// const {AdaptWrapper} = NativeModules;
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -58,8 +60,8 @@ function Section({children, title}: SectionProps): JSX.Element {
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const [greeting, setGreeting] = useState('');
-  const [addition, setAddition] = useState(0);
-  const [fileContents, setFileContents] = useState('');
+  // const [addition, setAddition] = useState(0);
+  // const [fileContents, setFileContents] = useState('');
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -67,32 +69,35 @@ function App(): JSX.Element {
 
   const showGreeting = async () => {
     try {
-      const greetingStr = await AdaptWrapper.greet('World');
-      setGreeting(greetingStr);
+      await AdaptEnvironment.InitializeAsync(true);
+      const systemTime = await AdaptEnvironment.SystemTime();
+      const systemTimeStr = await systemTime.Visualize();
+      // const greetingStr = await AdaptWrapper.greet('World');
+      setGreeting(systemTimeStr);
     } catch (e) {
       console.error(e);
     }
   };
 
   const showAddition = async () => {
-    try {
-      const result = await AdaptWrapper.add(5, 3);
-      setAddition(`Result: ${result}`);
-    } catch (e) {
-      console.error(e);
-    }
+    // try {
+    //   const result = await AdaptWrapper.add(5, 3);
+    //   setAddition(`Result: ${result}`);
+    // } catch (e) {
+    //   console.error(e);
+    // }
   };
 
   const readLocalFile = async () => {
-    try {
-      console.log(RNFS.MainBundlePath);
-      const result = await AdaptWrapper.readFileContents(
-        RNFS.MainBundlePath + '/test.txt',
-      );
-      setFileContents(`Result: ${result}`);
-    } catch (e) {
-      console.error(e);
-    }
+    // try {
+    //   console.log(RNFS.MainBundlePath);
+    //   const result = await AdaptWrapper.readFileContents(
+    //     RNFS.MainBundlePath + '/test.txt',
+    //   );
+    //   setFileContents(`Result: ${result}`);
+    // } catch (e) {
+    //   console.error(e);
+    // }
   };
 
   return (

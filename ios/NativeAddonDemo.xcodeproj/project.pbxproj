@@ -12,7 +12,6 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		42B7896B2B3480A2005CF02C /* libMyLibrary.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B7896A2B3480A2005CF02C /* libMyLibrary.a */; };
 		42B789702B35EBC9005CF02C /* libgmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B7896F2B35EBC9005CF02C /* libgmp.a */; };
 		42B789722B35EC12005CF02C /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789712B35EC12005CF02C /* libsodium.a */; };
 		42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789732B35EC2A005CF02C /* libwolfssl.a */; };
@@ -47,7 +46,6 @@
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeAddonDemo-NativeAddonDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-NativeAddonDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeAddonDemo.debug.xcconfig"; path = "Target Support Files/Pods-NativeAddonDemo/Pods-NativeAddonDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		42B789652B34650A005CF02C /* MyLibrary.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MyLibrary.hh; sourceTree = "<group>"; };
-		42B7896A2B3480A2005CF02C /* libMyLibrary.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libMyLibrary.a; sourceTree = "<group>"; };
 		42B7896E2B35EACF005CF02C /* mufl-bindings_ios.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "mufl-bindings_ios.hh"; sourceTree = "<group>"; };
 		42B7896F2B35EBC9005CF02C /* libgmp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libgmp.a; sourceTree = "<group>"; };
 		42B789712B35EC12005CF02C /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsodium.a; sourceTree = "<group>"; };
@@ -81,7 +79,6 @@
 				42B789722B35EC12005CF02C /* libsodium.a in Frameworks */,
 				0C80B921A6F3F58F76C31292 /* libPods-NativeAddonDemo.a in Frameworks */,
 				42B789762B35EC40005CF02C /* libnitroattest.a in Frameworks */,
-				42B7896B2B3480A2005CF02C /* libMyLibrary.a in Frameworks */,
 				42B789862B3C8355005CF02C /* libadapt.a in Frameworks */,
 				42B789702B35EBC9005CF02C /* libgmp.a in Frameworks */,
 				42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */,
@@ -116,7 +113,6 @@
 				42B789732B35EC2A005CF02C /* libwolfssl.a */,
 				42B789712B35EC12005CF02C /* libsodium.a */,
 				42B7896F2B35EBC9005CF02C /* libgmp.a */,
-				42B7896A2B3480A2005CF02C /* libMyLibrary.a */,
 				42D871B32B1F8B41002D15BA /* test.txt */,
 				42C873292B1966980000F773 /* include */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
