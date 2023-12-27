@@ -8,7 +8,7 @@ export class AdaptValue {
   }
 
   async Visualize(): Promise<string> {
-    return await AdaptEnvironment.adapt.AW_Visualize(this.address);
+    return await AdaptEnvironment.adapt.AV_Visualize(this.address);
   }
 }
 

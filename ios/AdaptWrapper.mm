@@ -88,7 +88,7 @@ RCT_EXPORT_METHOD(AE_SystemTime:(RCTPromiseResolveBlock)resolve
   resolve(key);
 }
 
-RCT_EXPORT_METHOD(AW_Visualize:(NSString *)key
+RCT_EXPORT_METHOD(AV_Visualize:(NSString *)key
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
   AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
