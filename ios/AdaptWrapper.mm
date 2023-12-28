@@ -124,10 +124,58 @@ RCT_EXPORT_METHOD(AE_getError:(RCTPromiseResolveBlock)resolve
   resolve(error);
 }
 
-RCT_EXPORT_METHOD(AE_ClearError:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(AE_clearError:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
   [AdaptEnvironment clearError];
   resolve(nil);
+}
+
+RCT_EXPORT_METHOD(AV_FromString:(NSString *)value
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* adaptValue = [AdaptValue FromString:value];
+  NSString* key = [adaptStorage storeObject:adaptValue];
+  resolve(key);
+}
+
+RCT_EXPORT_METHOD(AV_FromNumber:(NSInteger)value
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* adaptValue = [AdaptValue FromNumber:value];
+  NSString* key = [adaptStorage storeObject:adaptValue];
+  resolve(key);
+}
+
+RCT_EXPORT_METHOD(AV_FromBoolean:(BOOL)value
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* adaptValue = [AdaptValue FromBoolean:value];
+  NSString* key = [adaptStorage storeObject:adaptValue];
+  resolve(key);
+}
+
+RCT_EXPORT_METHOD(AV_Reduce:(NSString *)key
+                  v:(NSString *)v
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
+  AdaptValue* reducer = [adaptStorage retrieveObjectForKey:v];
+  AdaptValue* result = [value Reduce:reducer];
+  NSString* resultKey = [adaptStorage storeObject:result];
+  resolve(resultKey);
+}
+
+RCT_EXPORT_METHOD(AV_Mutate:(NSString *)key
+                  reducerKey:(NSString *)reducerKey
+                  productKey:(NSString *)productKey
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
+  AdaptValue* reducer = [adaptStorage retrieveObjectForKey:reducerKey];
+  AdaptValue* product = [adaptStorage retrieveObjectForKey:productKey];
+  AdaptValue* result = [value Mutate:reducer product:product];
+  NSString* resultKey = [adaptStorage storeObject:result];
+  resolve(resultKey);
 }
 
 RCT_EXPORT_METHOD(AV_Visualize:(NSString *)key
@@ -136,6 +184,24 @@ RCT_EXPORT_METHOD(AV_Visualize:(NSString *)key
   AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
   NSString* result = [value Visualize];
   resolve(result);
+}
+
+RCT_EXPORT_METHOD(AV_GetHash:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
+  AdaptValue* result = [value GetHash];
+  NSString* resultKey = [adaptStorage storeObject:result];
+  resolve(resultKey);
+}
+
+RCT_EXPORT_METHOD(AV_GetPacket:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptValue* value = [adaptStorage retrieveObjectForKey:key];
+  AdaptPacketContext* result = [value GetPacket];
+  NSString* resultKey = [adaptStorage storeObject:result];
+  resolve(resultKey);
 }
 
 RCT_EXPORT_METHOD(AV_GetNumber:(NSString *)key
@@ -320,6 +386,28 @@ RCT_EXPORT_METHOD(APC_ExecuteTransaction:(NSString *)unitKey
   AdaptValue* timestamp = [adaptStorage retrieveObjectForKey:timestampKey];
   [packet ExecuteTransaction:tx entropy_hex:entropyHex timestamp:timestamp];
   resolve(nil);
+}
+
+RCT_EXPORT_METHOD(APC_TransactionList:(NSString *)unitKey
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  reject(@"not_implemented", @"Not implemented", nil);
+}
+
+RCT_EXPORT_METHOD(APC_GetTransaction:(NSString *)unitKey
+                  functionName:(NSString *)functionName
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  reject(@"not_implemented", @"Not implemented", nil);
+}
+
+RCT_EXPORT_METHOD(APC_NilObject:(NSString*)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  AdaptPacketContext* value = [adaptStorage retrieveObjectForKey:key];
+  AdaptValue* nilValue = [value NilObject];
+  NSString* nilKey = [adaptStorage storeObject:nilValue];
+  resolve(nilKey);
 }
 
 RCT_EXPORT_METHOD(APC_GetHash:(NSString *)unitKey

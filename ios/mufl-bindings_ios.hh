@@ -2,12 +2,21 @@
 
 #import <Foundation/Foundation.h>
 
+@class AdaptPacketContext;
+
 @class AdaptValueImpl;
 
 @interface AdaptValue : NSObject {
     AdaptValueImpl* impl;
 }
 - (instancetype)init;
++ (AdaptValue*)FromString:(NSString*)value;
++ (AdaptValue*)FromNumber:(NSInteger)value;
++ (AdaptValue*)FromBoolean:(BOOL)value;
+- (AdaptValue*)Reduce:(AdaptValue*)v;
+- (AdaptValue*)Mutate:(AdaptValue*)reducer product:(AdaptValue*)product;
+- (AdaptValue*)GetHash;
+- (AdaptPacketContext*)GetPacket;
 - (NSString*)Visualize;
 - (NSInteger)GetNumber;
 - (BOOL)GetBoolean;
@@ -60,6 +69,7 @@
 - (AdaptValue*)GetCodeID;
 - (AdaptPacketContext*)Clone;
 //- (IteratorString*)TransactionsList;
+- (AdaptValue*)NilObject;
 - (void)Destroy;
 - (void)dealloc;
 - (AdaptPacketContextImpl*)getImpl;
