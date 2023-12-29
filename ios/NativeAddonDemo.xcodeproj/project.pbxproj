@@ -16,7 +16,7 @@
 		42B789722B35EC12005CF02C /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789712B35EC12005CF02C /* libsodium.a */; };
 		42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789732B35EC2A005CF02C /* libwolfssl.a */; };
 		42B789762B35EC40005CF02C /* libnitroattest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789752B35EC40005CF02C /* libnitroattest.a */; };
-		42B789912B3DBFE6005CF02C /* libadapt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789902B3DBFE6005CF02C /* libadapt.a */; };
+		42B789972B3F568A005CF02C /* libadapt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42B789962B3F568A005CF02C /* libadapt.a */; };
 		42C8732D2B1967130000F773 /* AdaptWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42C8732C2B1967130000F773 /* AdaptWrapper.mm */; };
 		42D871B42B1F8B41002D15BA /* test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 42D871B32B1F8B41002D15BA /* test.txt */; };
 		7699B88040F8A987B510C191 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-NativeAddonDemo-NativeAddonDemoTests.a */; };
@@ -51,7 +51,7 @@
 		42B789712B35EC12005CF02C /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsodium.a; sourceTree = "<group>"; };
 		42B789732B35EC2A005CF02C /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwolfssl.a; sourceTree = "<group>"; };
 		42B789752B35EC40005CF02C /* libnitroattest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libnitroattest.a; sourceTree = "<group>"; };
-		42B789902B3DBFE6005CF02C /* libadapt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadapt.a; sourceTree = "<group>"; };
+		42B789962B3F568A005CF02C /* libadapt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadapt.a; sourceTree = "<group>"; };
 		42C8732B2B1966FC0000F773 /* AdaptWrapper.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AdaptWrapper.hh; sourceTree = "<group>"; };
 		42C8732C2B1967130000F773 /* AdaptWrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AdaptWrapper.mm; sourceTree = "<group>"; };
 		42D871B32B1F8B41002D15BA /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
@@ -78,7 +78,7 @@
 			files = (
 				42B789722B35EC12005CF02C /* libsodium.a in Frameworks */,
 				0C80B921A6F3F58F76C31292 /* libPods-NativeAddonDemo.a in Frameworks */,
-				42B789912B3DBFE6005CF02C /* libadapt.a in Frameworks */,
+				42B789972B3F568A005CF02C /* libadapt.a in Frameworks */,
 				42B789762B35EC40005CF02C /* libnitroattest.a in Frameworks */,
 				42B789702B35EBC9005CF02C /* libgmp.a in Frameworks */,
 				42B789742B35EC2A005CF02C /* libwolfssl.a in Frameworks */,
@@ -108,7 +108,7 @@
 		13B07FAE1A68108700A75B9A /* NativeAddonDemo */ = {
 			isa = PBXGroup;
 			children = (
-				42B789902B3DBFE6005CF02C /* libadapt.a */,
+				42B789962B3F568A005CF02C /* libadapt.a */,
 				42B789752B35EC40005CF02C /* libnitroattest.a */,
 				42B789732B35EC2A005CF02C /* libwolfssl.a */,
 				42B789712B35EC12005CF02C /* libsodium.a */,

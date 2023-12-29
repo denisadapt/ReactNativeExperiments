@@ -5,6 +5,9 @@
 @class AdaptPacketContext;
 
 @class AdaptValueImpl;
+@class AdaptEvaluationUnitImpl;
+@class AdaptPacketContextImpl;
+@class AdaptFunctionInvocationImpl;
 
 @interface AdaptValue : NSObject {
     AdaptValueImpl* impl;
@@ -18,6 +21,7 @@
 - (AdaptValue*)GetHash;
 - (AdaptPacketContext*)GetPacket;
 - (NSString*)Visualize;
+- (NSData*)Serialize;
 - (NSInteger)GetNumber;
 - (BOOL)GetBoolean;
 - (AdaptValueImpl*)getImpl;
@@ -28,8 +32,6 @@
 - (void)Destroy;
 - (void)dealloc;
 @end
-
-@class AdaptEvaluationUnitImpl;
 
 @interface AdaptEvaluationUnit : NSObject {
     AdaptEvaluationUnitImpl* impl;
@@ -46,7 +48,19 @@
 - (void)dealloc;
 @end
 
-@class AdaptPacketContextImpl;
+@interface AdaptFunctionInvocation : NSObject {
+    AdaptFunctionInvocationImpl* impl;
+}
+- (instancetype)init;
+- (AdaptFunctionInvocationImpl*)getImpl;
+- (void)Reset;
+- (void)PushParameter:(AdaptValue*)value;
+- (AdaptValue*)Execute;
+- (bool)IsEmpty;
+- (void)Destroy;
+- (void)Check;
+- (void)dealloc;
+@end
 
 @interface AdaptPacketContext : NSObject {
     AdaptPacketContextImpl* impl;
@@ -62,13 +76,13 @@
 - (AdaptValue*)NewBinaryFromHex:(NSString*)hex;
 - (AdaptValue*)NewBinaryFromBuffer:(NSData*)data;
 - (AdaptValue*)ExecuteTransaction:(AdaptValue*)transaction entropy_hex:(NSString*)entropy_hex timestamp:(AdaptValue*)timestamp;
-//- (AdaptFunctionInvocation*)GetFunction:(NSString*)functionName;
+- (AdaptFunctionInvocation*)GetFunction:(NSString*)functionName;
 - (AdaptValue*)GetHash;
 - (NSData*)Serialize;
 - (AdaptValue*)GetContainerID;
 - (AdaptValue*)GetCodeID;
 - (AdaptPacketContext*)Clone;
-//- (IteratorString*)TransactionsList;
+- (NSArray*)TransactionsList;
 - (AdaptValue*)NilObject;
 - (void)Destroy;
 - (void)dealloc;
