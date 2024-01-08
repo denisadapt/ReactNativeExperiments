@@ -1,83 +1,96 @@
 import {NativeModules} from 'react-native';
 
+declare type AdaptValueKey = {
+  address: string;
+  _type: 'AdaptValue';
+};
+
 export class AdaptValue {
+  value: AdaptValueKey;
   address: string;
 
-  constructor(address: string) {
-    this.address = address;
+  constructor(address: string | AdaptValueKey) {
+    console.log('AdaptValue constructor ', address);
+    if (typeof address === 'string') {
+      this.address = address;
+      this.value = {
+        address: address,
+        _type: 'AdaptValue',
+      };
+    } else {
+      this.address = address.address;
+      this.value = address;
+    }
   }
 
-  async Visualize(): Promise<string> {
-    return await AdaptEnvironment.adapt.AV_Visualize(this.address);
+  Visualize(): string {
+    return AdaptEnvironment.adapt.AV_Visualize(this.value);
   }
 
-  async Destroy(): Promise<void> {
-    await AdaptEnvironment.adapt.AV_Destroy(this.address);
+  Destroy(): void {
+    AdaptEnvironment.adapt.AV_Destroy(this.value);
   }
 
-  async Serialize(): Promise<Buffer> {
-    return await AdaptEnvironment.adapt.AV_Serialize(this.address);
+  Serialize(): Buffer {
+    return AdaptEnvironment.adapt.AV_Serialize(this.value);
   }
 
-  async GetHash(): Promise<AdaptValue> {
-    return await AdaptEnvironment.adapt.AV_GetHash(this.address);
+  GetHash(): AdaptValue {
+    return AdaptEnvironment.adapt.AV_GetHash(this.value);
   }
 
-  async Reduce(reducer: AdaptValue): Promise<AdaptValue> {
-    return await AdaptEnvironment.adapt.AV_Reduce(
-      this.address,
-      reducer.address,
+  Reduce(reducer: AdaptValue): AdaptValue {
+    return AdaptEnvironment.adapt.AV_Reduce(this.value, reducer.value);
+  }
+
+  Mutate(reducer: AdaptValue, product: AdaptValue): AdaptValue {
+    return AdaptEnvironment.adapt.AV_Mutate(
+      this.value,
+      reducer.value,
+      product.value,
     );
   }
 
-  async Mutate(reducer: AdaptValue, product: AdaptValue): Promise<AdaptValue> {
-    return await AdaptEnvironment.adapt.AV_Mutate(
-      this.address,
-      reducer.address,
-      product.address,
-    );
-  }
-
-  async GetPacket(): Promise<AdaptPacketContext> {
+  GetPacket(): AdaptPacketContext {
     return new AdaptPacketContext(
-      await AdaptEnvironment.adapt.AV_GetPacket(this.address),
+      AdaptEnvironment.adapt.AV_GetPacket(this.value),
     );
   }
 
-  async GetNumber(): Promise<number> {
-    return await AdaptEnvironment.adapt.AV_GetNumber(this.address);
+  GetNumber(): number {
+    return AdaptEnvironment.adapt.AV_GetNumber(this.value);
   }
 
-  async GetBoolean(): Promise<boolean> {
-    return await AdaptEnvironment.adapt.AV_GetBoolean(this.address);
+  GetBoolean(): boolean {
+    return AdaptEnvironment.adapt.AV_GetBoolean(this.value);
   }
 
-  async GetBinary(): Promise<Buffer> {
-    return await AdaptEnvironment.adapt.AV_GetBinary(this.address);
+  GetBinary(): Buffer {
+    return AdaptEnvironment.adapt.AV_GetBinary(this.value);
   }
 
-  async IsNil(): Promise<boolean> {
-    return await AdaptEnvironment.adapt.AV_IsNil(this.address);
+  IsNil(): boolean {
+    return AdaptEnvironment.adapt.AV_IsNil(this.value);
   }
 
-  async Equals(other: AdaptValue): Promise<boolean> {
-    return await AdaptEnvironment.adapt.AV_Equals(this.address, other.address);
+  Equals(other: AdaptValue): boolean {
+    return AdaptEnvironment.adapt.AV_Equals(this.value, other.value);
   }
 
-  async Less(other: AdaptValue): Promise<boolean> {
-    return await AdaptEnvironment.adapt.AV_Less(this.address, other.address);
+  Less(other: AdaptValue): boolean {
+    return AdaptEnvironment.adapt.AV_Less(this.value, other.value);
   }
 
-  static async FromNumber(value: number): Promise<AdaptValue> {
-    return new AdaptValue(await AdaptEnvironment.adapt.AV_FromNumber(value));
+  static FromNumber(value: number): AdaptValue {
+    return new AdaptValue(AdaptEnvironment.adapt.AV_FromNumber(value));
   }
 
-  static async FromBoolean(value: boolean): Promise<AdaptValue> {
-    return new AdaptValue(await AdaptEnvironment.adapt.AV_FromBoolean(value));
+  static FromBoolean(value: boolean): AdaptValue {
+    return new AdaptValue(AdaptEnvironment.adapt.AV_FromBoolean(value));
   }
 
-  static async FromString(value: string): Promise<AdaptValue> {
-    return new AdaptValue(await AdaptEnvironment.adapt.AV_FromString(value));
+  static FromString(value: string): AdaptValue {
+    return new AdaptValue(AdaptEnvironment.adapt.AV_FromString(value));
   }
 }
 
@@ -88,52 +101,49 @@ export class AdaptPacketContext {
     this.address = address;
   }
 
-  static async LoadFromFile(path: string): Promise<AdaptPacketContext> {
+  static LoadFromFile(path: string): AdaptPacketContext {
     return new AdaptPacketContext(
-      await AdaptEnvironment.adapt.APC_LoadFromFile(path),
+      AdaptEnvironment.adapt.APC_LoadFromFile(path),
     );
   }
 
-  static async LoadFromContents(contents: Buffer): Promise<AdaptPacketContext> {
+  static LoadFromContents(contents: Buffer): AdaptPacketContext {
     return new AdaptPacketContext(
-      await AdaptEnvironment.adapt.APC_LoadFromContents(contents),
+      AdaptEnvironment.adapt.APC_LoadFromContents(contents),
     );
   }
 
-  async Destroy(): Promise<void> {
-    await AdaptEnvironment.adapt.APC_Destroy(this.address);
+  Destroy(): void {
+    AdaptEnvironment.adapt.APC_Destroy(this.address);
   }
 
-  async ParseValue(value: AdaptValue): Promise<AdaptValue> {
+  ParseValue(value: AdaptValue): AdaptValue {
     return new AdaptValue(
-      await AdaptEnvironment.adapt.APC_ParseValue(this.address, value.address),
+      AdaptEnvironment.adapt.APC_ParseValue(this.address, value.value),
     );
   }
 
-  async ParseValueFromJSON(json: string): Promise<AdaptValue> {
+  ParseValueFromJSON(json: string): AdaptValue {
     return new AdaptValue(
-      await AdaptEnvironment.adapt.APC_ParseValueFromJSON(this.address, json),
+      AdaptEnvironment.adapt.APC_ParseValueFromJSON(this.address, json),
     );
   }
 
-  async CreateDictionary(): Promise<AdaptValue> {
+  CreateDictionary(): AdaptValue {
     return new AdaptValue(
-      await AdaptEnvironment.adapt.APC_CreateDictionary(this.address),
+      AdaptEnvironment.adapt.APC_CreateDictionary(this.address),
     );
   }
 
-  async NewBinaryFromHex(hex: string): Promise<AdaptValue> {
+  NewBinaryFromHex(hex: string): AdaptValue {
     return new AdaptValue(
-      await AdaptEnvironment.adapt.APC_NewBinaryFromHex(this.address, hex),
+      AdaptEnvironment.adapt.APC_NewBinaryFromHex(this.address, hex),
     );
   }
 
-  async NewBinaryFromBuffer(buffer: Buffer): Promise<AdaptValue> {
+  NewBinaryFromBuffer(buffer: Buffer): AdaptValue {
     return new AdaptValue(
-      await AdaptEnvironment.adapt.APC_NewBinaryFromBuffer(
-        this.address,
-        buffer,
-      ),
+      AdaptEnvironment.adapt.APC_NewBinaryFromBuffer(this.address, buffer),
     );
   }
 }
@@ -147,21 +157,21 @@ export class AdaptEnvironment {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public static Initialize(test_mode: boolean): boolean {
-    throw new Error('Sync mode not supported on React Native');
+    this.adapt = NativeModules.AdaptWrapperNative;
+    return this.adapt.AE_Initialize(test_mode);
   }
 
   public static async InitializeAsync(test_mode: boolean): Promise<boolean> {
     // if (this.adapt !== undefined) {
     //   throw new Error('AdaptEnvironment already initialized');
     // }
-    this.adapt = NativeModules.AdaptWrapper;
-    return await this.adapt.AE_Initialize(test_mode);
+    this.adapt = NativeModules.AdaptWrapperNative;
+    return this.adapt.AE_Initialize(test_mode);
   }
 
-  public static async SystemTime(): Promise<AdaptValue> {
+  public static SystemTime(): AdaptValue {
     this.Check();
-    return new AdaptValue(await this.adapt.AE_SystemTime());
+    return new AdaptValue(this.adapt.AE_SystemTime());
   }
 }

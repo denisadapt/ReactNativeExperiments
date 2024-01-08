@@ -1,29 +1,42 @@
 #import "AdaptWrapper.hh"
 #import "mufl-bindings_ios.hh"
 
-#define GET_OBJECT( name, cls, key ) \
+#define GET_OBJECT_OR_E_RETURN( name, cls, key ) \
   cls* name = [adaptStorage retrieveObjectForKey:key]; \
-  if ( name == nil ) { \
-    reject(@"AccessError", @"Object not found", nil); \
-    return; \
-  } else if ( ![name isKindOfClass:[cls class]] ) { \
-    reject(@"AccessError", @"Object is not of the expected type", nil); \
-    return; \
+  if (name == nil) { \
+    [AdaptEnvironment setError:[NSString stringWithFormat:@"Couldn't find object by key %@", key]]; \
+    return @""; \
   }
 
-#define CHECK_ERROR \
-  if ( [AdaptEnvironment hasError] ) { \
-    reject(@"", [AdaptEnvironment getError], nil); \
-    return; \
+#define AV_EMPTY @{ @"address": @"", @"_type": @"AdaptValue" }
+#define APC_EMPTY @{ @"address": @"", @"_type": @"AdaptPacketContext" }
+#define AEU_EMPTY @{ @"address": @"", @"_type": @"AdaptEvaluationUnit" }
+#define AFI_EMPTY @{ @"address": @"", @"_type": @"AdaptFunctionInvocation" }
+
+#define GET_OBJECT_OR_E_RETURN_NEW( NAME, CLS, KEY, RET ) \
+  if (![KEY[@"address"] isKindOfClass:[NSString class]] || ![KEY[@"_type"] isKindOfClass:[NSString class]]) { \
+    [AdaptEnvironment setError:@"Invalid key format"]; \
+    return RET; \
+  } \
+  if (![KEY[@"_type"] isEqualToString: NSStringFromClass([CLS class])]) { \
+    [AdaptEnvironment setError:@"Invalid type"]; \
+    return RET; \
+  } \
+  CLS* NAME = [adaptStorage retrieveObjectForKey:KEY[@"address"]]; \
+  if (NAME == nil) { \
+    [AdaptEnvironment setError:[NSString stringWithFormat:@"Couldn't find object by key %@", KEY[@"address"]]]; \
+    return RET; \
   }
 
-#define RESOLVE_OR_REJECT( ret ) \
-  if ( [AdaptEnvironment hasError] ) { \
-    reject(@"", [AdaptEnvironment getError], nil); \
-  } else { \
-    NSString* returnKey = [adaptStorage storeObject:ret]; \
-    resolve(returnKey); \
-  }
+#define STORE_AND_RETURN_NEW( ret, type ) \
+  return @{ @"address": [adaptStorage storeObject:ret], @"_type": type };
+
+#define AV_STORE_AND_RETURN( ret ) STORE_AND_RETURN_NEW( ret, @"AdaptValue" )
+#define APC_STORE_AND_RETURN( ret ) STORE_AND_RETURN_NEW( ret, @"AdaptPacketContext" )
+#define AEU_STORE_AND_RETURN( ret ) STORE_AND_RETURN_NEW( ret, @"AdaptEvaluationUnit" )
+#define AFI_STORE_AND_RETURN( ret ) STORE_AND_RETURN_NEW( ret, @"AdaptFunctionInvocation" )
+
+#define STORE_AND_RETURN( ret ) return [adaptStorage storeObject:ret];
 
 @interface ObjectStorage : NSObject
 - (NSString *)storeObject:(id)object;
@@ -70,406 +83,396 @@ static void initializeAdaptStorage() {
 
 @implementation AdaptWrapper
 
-RCT_EXPORT_MODULE(AdaptWrapper); // Expose this module to React Native
+RCT_EXPORT_MODULE(AdaptWrapperNative); // Expose this module to React Native
 
-RCT_EXPORT_METHOD(AE_Initialize:(BOOL)test_mode
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  BOOL init = [AdaptEnvironment Initialize:test_mode];
-  resolve(@(init));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_Initialize:(BOOL)test_mode)
+{
+  return @([AdaptEnvironment Initialize:test_mode]);
 }
 
-RCT_EXPORT_METHOD(AE_EmptyPacket:(BOOL)secure
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_EmptyPacket:(BOOL)secure)
+{
   AdaptPacketContext* packet = [AdaptEnvironment EmptyPacket:secure];
-  RESOLVE_OR_REJECT( packet )
+  APC_STORE_AND_RETURN( packet )
 }
 
-RCT_EXPORT_METHOD(AE_CreatePacket:(NSString*)unitKey
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_CreatePacket:(NSDictionary*)unitKey
                   seed:(NSString*)seed
                   entropy:(NSString*)entropy
-                  secure:(BOOL)secure
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( unit, AdaptEvaluationUnit, unitKey )
+                  secure:(BOOL)secure)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( unit, AdaptEvaluationUnit, unitKey, APC_EMPTY )
   AdaptPacketContext* packet = [AdaptEnvironment CreatePacket:unit seed:seed entropy:entropy secure:secure];
-  RESOLVE_OR_REJECT( packet )
+  APC_STORE_AND_RETURN( packet )
 }
 
-RCT_EXPORT_METHOD(AE_SystemTime:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_SystemTime)
+{
   AdaptValue* time = [AdaptEnvironment SystemTime];
-  RESOLVE_OR_REJECT( time )
+  AV_STORE_AND_RETURN( time )
 }
 
-RCT_EXPORT_METHOD(AE_ParseTime:(NSString*)time
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_SystemTimeNew)
+{
+  AdaptValue* time = [AdaptEnvironment SystemTime];
+  AV_STORE_AND_RETURN( time )
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_ParseTime:(NSString*)time)
+{
   AdaptValue* value = [AdaptEnvironment ParseTime:time];
-  RESOLVE_OR_REJECT( value )
+  AV_STORE_AND_RETURN( value )
 }
 
-RCT_EXPORT_METHOD(AE_GetRandomBytes:(int)length
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_GetRandomBytes:(int)length)
+{
   AdaptValue* value = [AdaptEnvironment GetRandomBytes:length];
-  RESOLVE_OR_REJECT( value )
+  AV_STORE_AND_RETURN( value )
 }
 
-RCT_EXPORT_METHOD(AE_hasError:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  BOOL hasError = [AdaptEnvironment hasError];
-  resolve(@(hasError));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_hasError)
+{
+  return @([AdaptEnvironment hasError]);
 }
 
-RCT_EXPORT_METHOD(AE_getError:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  NSString *error = [AdaptEnvironment getError];
-  resolve(error);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_getError)
+{
+  return [AdaptEnvironment getError];
 }
 
-RCT_EXPORT_METHOD(AE_clearError:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AE_clearError)
+{
   [AdaptEnvironment clearError];
-  resolve(nil);
+  return @"";
 }
 
-RCT_EXPORT_METHOD(AV_FromString:(NSString *)value
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_FromString:(NSString *)value) {
   AdaptValue* adaptValue = [AdaptValue FromString:value];
-  RESOLVE_OR_REJECT( adaptValue )
+  AV_STORE_AND_RETURN( adaptValue )
 }
 
-RCT_EXPORT_METHOD(AV_FromNumber:(NSInteger)value
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_FromNumber:(NSInteger)value)
+{
   AdaptValue* adaptValue = [AdaptValue FromNumber:value];
-  RESOLVE_OR_REJECT( adaptValue )
+  AV_STORE_AND_RETURN( adaptValue )
 }
 
-RCT_EXPORT_METHOD(AV_FromBoolean:(BOOL)value
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_FromBoolean:(BOOL)value) {
   AdaptValue* adaptValue = [AdaptValue FromBoolean:value];
-  RESOLVE_OR_REJECT( adaptValue )
+  AV_STORE_AND_RETURN( adaptValue )
 }
 
-RCT_EXPORT_METHOD(AV_Reduce:(NSString *)key
-                  v:(NSString *)v
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  GET_OBJECT( reducer, AdaptValue, v )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Reduce:(NSDictionary *)key v:(NSDictionary *)v)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, AV_EMPTY )
+  GET_OBJECT_OR_E_RETURN_NEW( reducer, AdaptValue, v, AV_EMPTY )
   AdaptValue* result = [value Reduce:reducer];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(AV_Mutate:(NSString *)key
-                  reducerKey:(NSString *)reducerKey
-                    :(NSString *)productKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  GET_OBJECT(reducer, AdaptValue, reducerKey)
-  GET_OBJECT(product, AdaptValue, productKey)
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Mutate:(NSDictionary *)key reducerKey:(NSDictionary *)reducerKey productKey:(NSDictionary *)productKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, AV_EMPTY )
+  GET_OBJECT_OR_E_RETURN_NEW(reducer, AdaptValue, reducerKey, AV_EMPTY )
+  GET_OBJECT_OR_E_RETURN_NEW(product, AdaptValue, productKey, AV_EMPTY )
   AdaptValue* result = [value Mutate:reducer product:product];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(AV_Visualize:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  NSString* result = [value Visualize];
-  CHECK_ERROR
-  resolve(result);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Visualize:(NSDictionary *)key)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @"" )
+  return [value Visualize];
 }
 
-RCT_EXPORT_METHOD(AV_Serialize:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  NSData* result = [value Serialize];
-  CHECK_ERROR
-  resolve(result);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_VisualizeNew:(NSDictionary*)key)
+{
+//  if (![key[@"address"] isKindOfClass:[NSString class]] || ![key[@"_type"] isKindOfClass:[NSString class]]) {
+//    [AdaptEnvironment setError:@"Invalid key format"];
+//    return @"";
+//  }
+//  if (![key[@"_type"] isEqualToString: NSStringFromClass([AdaptValue class])]) {
+//    [AdaptEnvironment setError:@"Invalid type"];
+////    [AdaptEnvironment setError:[NSString stringWithFormat:@"Expected object of type %@, but got %@", NSStringFromClass([AdaptValue class]), ]];
+//    return @"";
+//  }
+//  AdaptValue* value = [adaptStorage retrieveObjectForKey:key[@"address"]];
+//  if (!value) {
+//    [AdaptEnvironment setError:[NSString stringWithFormat:@"Couldn't find object by key %@", key[@"address"]]];
+//    return @"";
+//  }
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @"" )
+  return [value Visualize];
+//  AdaptValue* value = [adaptStorage getObject:[key objectForKey:@"address"]];
+  
 }
 
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Serialize:(NSDictionary *)key)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, [NSData new] )
+  return [value Serialize];
+}
 
-RCT_EXPORT_METHOD(AV_GetHash:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_GetHash:(NSDictionary *)key) {
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, AV_EMPTY )
   AdaptValue* result = [value GetHash];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(AV_GetPacket:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_GetPacket:(NSDictionary *)key)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, APC_EMPTY )
   AdaptPacketContext* result = [value GetPacket];
-  RESOLVE_OR_REJECT( result )
+  APC_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(AV_GetNumber:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  NSInteger result = [value GetNumber];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_GetNumber:(NSDictionary *)key) {
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @(-1) )
+  return @([value GetNumber]);
 }
 
-RCT_EXPORT_METHOD(AV_GetBoolean:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  BOOL result = [value GetBoolean];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_GetBoolean:(NSDictionary *)key)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @(NO) )
+  return @([value GetBoolean]);
 }
 
-RCT_EXPORT_METHOD(AV_GetBinary:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  NSData* result = [value GetBinary];
-  CHECK_ERROR
-  resolve(result);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_GetBinary:(NSDictionary *)key) {
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, [NSData new] )
+  return [value GetBinary];
 }
 
-RCT_EXPORT_METHOD(AV_IsNil:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  BOOL result = [value IsNil];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(AV_IsNil:(NSDictionary *)key) {
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @(YES) )
+  return @([value IsNil]);
 }
 
-RCT_EXPORT_METHOD(AV_Equals:(NSString *)key
-                  rhs:(NSString *)otherKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  GET_OBJECT( other, AdaptValue, otherKey )
-  BOOL result = [value Equals:other];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Equals:(NSDictionary *)key rhs:(NSDictionary *)otherKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @(NO) )
+  GET_OBJECT_OR_E_RETURN_NEW( other, AdaptValue, otherKey, @(NO) )
+  return @([value Equals:other]);
 }
 
-RCT_EXPORT_METHOD(AV_Less:(NSString *)key
-                  rhs:(NSString *)otherKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptValue, key )
-  GET_OBJECT( other, AdaptValue, otherKey )
-  BOOL result = [value Less:other];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Less:(NSDictionary *)key rhs:(NSDictionary *)otherKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, key, @(NO) )
+  GET_OBJECT_OR_E_RETURN_NEW( other, AdaptValue, otherKey, @(NO) )
+  return @([value Less:other]);
 }
 
-RCT_EXPORT_METHOD(AV_Destroy:(NSString *)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  [adaptStorage removeObjectForKey:key];
-  resolve(nil);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AV_Destroy:(NSDictionary *)key)
+{
+  [adaptStorage removeObjectForKey:key[@"address"]];  // TODO
+  return @"";
 }
 
-RCT_EXPORT_METHOD(AEU_LoadFromFile:(NSString *)path
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_LoadFromFile:(NSString *)path) {
   AdaptEvaluationUnit* unit = [AdaptEvaluationUnit LoadFromFile:path];
-  RESOLVE_OR_REJECT( unit )
+  AEU_STORE_AND_RETURN( unit )
 }
 
-RCT_EXPORT_METHOD(AEU_LoadFromContents:(NSData*)bin
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_LoadFromContents:(NSData*)bin)
+{
   AdaptEvaluationUnit* unit = [AdaptEvaluationUnit LoadFromContents:bin];
-  RESOLVE_OR_REJECT( unit )
+  AEU_STORE_AND_RETURN( unit )
 }
 
-RCT_EXPORT_METHOD(AEU_Clone:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( unit, AdaptEvaluationUnit, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_Clone:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( unit, AdaptEvaluationUnit, unitKey, AEU_EMPTY )
   AdaptEvaluationUnit* clone = [unit Clone];
-  RESOLVE_OR_REJECT( clone )
+  AEU_STORE_AND_RETURN( clone )
 }
 
-RCT_EXPORT_METHOD(AEU_IsEmpty:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( unit, AdaptEvaluationUnit, unitKey )
-  BOOL result = [unit IsEmpty];
-  CHECK_ERROR
-  resolve(@(result));
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_IsEmpty:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( unit, AdaptEvaluationUnit, unitKey, @(YES) )
+  return @([unit IsEmpty]);
 }
 
-RCT_EXPORT_METHOD(AEU_Destroy:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  [adaptStorage removeObjectForKey:unitKey];
-  resolve(nil);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_Destroy:(NSDictionary *)unitKey)
+{
+  [adaptStorage removeObjectForKey:unitKey[@"address"]];  // TODO
+  return @"";
 }
 
-RCT_EXPORT_METHOD(AEU_Check:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( unit, AdaptEvaluationUnit, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (AEU_Check:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( unit, AdaptEvaluationUnit, unitKey, @"" )
   [unit Check];
-  CHECK_ERROR
-  resolve(nil);
+  return @"";
 }
 
-RCT_EXPORT_METHOD(APC_LoadFromFile:(NSString *)path
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_LoadFromFile:(NSString *)path)
+{
   AdaptPacketContext* packet = [AdaptPacketContext LoadFromFile:path];
-  RESOLVE_OR_REJECT( packet )
+  APC_STORE_AND_RETURN( packet )
 }
 
-RCT_EXPORT_METHOD(APC_LoadFromContents:(NSData*)bin
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_LoadFromContents:(NSData*)bin)
+{
   AdaptPacketContext* packet = [AdaptPacketContext LoadFromContents:bin];
-  RESOLVE_OR_REJECT( packet )
+  APC_STORE_AND_RETURN( packet )
 }
 
-RCT_EXPORT_METHOD(APC_ParseValue:(NSString *)unitKey
-                    :(NSString *)valueKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
-  GET_OBJECT( value, AdaptValue, valueKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_ParseValue:(NSDictionary *)unitKey
+                val:(NSDictionary *)valueKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptValue, valueKey, AV_EMPTY )
   AdaptValue* result = [packet ParseValue:value];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(APC_ParseValueFromJSON:(NSString *)unitKey
-                  json:(NSString *)json
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_ParseValueFromJSON:(NSDictionary *)unitKey json:(NSString *)json)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* result = [packet ParseValueFromJSON:json];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(APC_CreateDictionary:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_CreateDictionary:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* result = [packet CreateDictionary];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(APC_NewBinaryFromHex:(NSString *)unitKey
-                  hex:(NSString *)hex
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_NewBinaryFromHex:(NSDictionary *)unitKey hex:(NSString *)hex)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* result = [packet NewBinaryFromHex:hex];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(APC_NewBinaryFromBuffer:(NSString *)unitKey
-                    :(NSData *)data
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_NewBinaryFromBuffer:(NSDictionary *)unitKey data:(NSData *)data)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* result = [packet NewBinaryFromBuffer:data];
-  RESOLVE_OR_REJECT( result )
+  AV_STORE_AND_RETURN( result )
 }
 
-RCT_EXPORT_METHOD(APC_ExecuteTransaction:(NSString *)unitKey
-                  txKey:(NSString *)txKey
-                  entropyHex:(NSString *)entropyHex
-                  timestampKey:(NSString *)timestampKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
-  GET_OBJECT( tx, AdaptValue, txKey )
-  GET_OBJECT( timestamp, AdaptValue, timestampKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_ExecuteTransaction:(NSDictionary *)unitKey
+                   txKey:(NSDictionary *)txKey
+              entropyHex:(NSString *)entropyHex
+            timestampKey:(NSDictionary *)timestampKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, @"" )
+  GET_OBJECT_OR_E_RETURN_NEW( tx, AdaptValue, txKey, @"" )
+  GET_OBJECT_OR_E_RETURN_NEW( timestamp, AdaptValue, timestampKey, @"" )
   [packet ExecuteTransaction:tx entropy_hex:entropyHex timestamp:timestamp];
-  CHECK_ERROR
-  resolve(nil);
+  return @"";
 }
 
-RCT_EXPORT_METHOD(APC_TransactionsList:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
-  NSArray* result = [packet TransactionsList];
-  CHECK_ERROR
-  resolve(result);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_TransactionsList:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, @[] )
+  return [packet TransactionsList];
 }
 
-RCT_EXPORT_METHOD(APC_GetFunction:(NSString *)unitKey
-                  functionName:(NSString *)functionName
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_GetFunction:(NSDictionary *)unitKey
+     functionName:(NSString *)functionName)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AFI_EMPTY )
   AdaptFunctionInvocation* function = [packet GetFunction:functionName];
-  RESOLVE_OR_REJECT( function )
+  AFI_STORE_AND_RETURN( function )
 }
 
-RCT_EXPORT_METHOD(APC_NilObject:(NSString*)key
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( value, AdaptPacketContext, key )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_NilObject:(NSDictionary*)key)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( value, AdaptPacketContext, key, AV_EMPTY )
   AdaptValue* nilValue = [value NilObject];
-  RESOLVE_OR_REJECT( nilValue )
+  AV_STORE_AND_RETURN( nilValue )
 }
 
-RCT_EXPORT_METHOD(APC_GetHash:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_GetHash:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* hash = [packet GetHash];
-  RESOLVE_OR_REJECT( hash )
+  AV_STORE_AND_RETURN( hash )
 }
 
-RCT_EXPORT_METHOD(APC_Serialize:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
-  NSData* bin = [packet Serialize];
-  CHECK_ERROR
-  resolve(bin);
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_Serialize:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, @[] )
+  return [packet Serialize];
 }
 
-RCT_EXPORT_METHOD(APC_GetContainerID:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_GetContainerID:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* cid = [packet GetContainerID];
-  RESOLVE_OR_REJECT( cid )
+  AV_STORE_AND_RETURN( cid )
 }
 
-RCT_EXPORT_METHOD(APC_GetCodeID:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_GetCodeID:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, AV_EMPTY )
   AdaptValue* cid = [packet GetCodeID];
-  RESOLVE_OR_REJECT( cid )
+  AV_STORE_AND_RETURN( cid )
 }
 
-RCT_EXPORT_METHOD(APC_Clone:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  GET_OBJECT( packet, AdaptPacketContext, unitKey )
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_Clone:(NSDictionary *)unitKey)
+{
+  GET_OBJECT_OR_E_RETURN_NEW( packet, AdaptPacketContext, unitKey, APC_EMPTY )
   AdaptPacketContext* clone = [packet Clone];
-  RESOLVE_OR_REJECT( clone )
+  APC_STORE_AND_RETURN( clone )
 }
 
-RCT_EXPORT_METHOD(APC_Destroy:(NSString *)unitKey
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD
+ (APC_Destroy:(NSString *)unitKey)
+{
   [adaptStorage removeObjectForKey:unitKey];
-  resolve(nil);
+  return @"";
 }
 
 @end

@@ -69,9 +69,12 @@ function App(): JSX.Element {
 
   const showGreeting = async () => {
     try {
-      await AdaptEnvironment.InitializeAsync(true);
-      const systemTime = await AdaptEnvironment.SystemTime();
-      const systemTimeStr = await systemTime.Visualize();
+      setGreeting('Initializing...');
+      AdaptEnvironment.Initialize(true);
+      setGreeting('Initialized');
+      const systemTime = AdaptEnvironment.SystemTime();
+      setGreeting('Got system time');
+      const systemTimeStr = systemTime.Visualize();
       // const greetingStr = await AdaptWrapper.greet('World');
       setGreeting(systemTimeStr);
     } catch (e) {
@@ -79,26 +82,26 @@ function App(): JSX.Element {
     }
   };
 
-  const showAddition = async () => {
-    // try {
-    //   const result = await AdaptWrapper.add(5, 3);
-    //   setAddition(`Result: ${result}`);
-    // } catch (e) {
-    //   console.error(e);
-    // }
-  };
-
-  const readLocalFile = async () => {
-    // try {
-    //   console.log(RNFS.MainBundlePath);
-    //   const result = await AdaptWrapper.readFileContents(
-    //     RNFS.MainBundlePath + '/test.txt',
-    //   );
-    //   setFileContents(`Result: ${result}`);
-    // } catch (e) {
-    //   console.error(e);
-    // }
-  };
+  // const showAddition = async () => {
+  //   // try {
+  //   //   const result = await AdaptWrapper.add(5, 3);
+  //   //   setAddition(`Result: ${result}`);
+  //   // } catch (e) {
+  //   //   console.error(e);
+  //   // }
+  // };
+  //
+  // const readLocalFile = async () => {
+  //   // try {
+  //   //   console.log(RNFS.MainBundlePath);
+  //   //   const result = await AdaptWrapper.readFileContents(
+  //   //     RNFS.MainBundlePath + '/test.txt',
+  //   //   );
+  //   //   setFileContents(`Result: ${result}`);
+  //   // } catch (e) {
+  //   //   console.error(e);
+  //   // }
+  // };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -117,14 +120,6 @@ function App(): JSX.Element {
           <Section title="Greeting">
             <Text>{greeting}</Text>
             <Button title="Greet" onPress={showGreeting} />
-          </Section>
-          <Section title="Addition">
-            <Text>{addition}</Text>
-            <Button title="Add" onPress={showAddition} />
-          </Section>
-          <Section title="Read local file">
-            <Text>{fileContents}</Text>
-            <Button title="Read file" onPress={readLocalFile} />
           </Section>
         </View>
       </ScrollView>
